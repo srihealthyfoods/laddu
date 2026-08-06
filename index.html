@@ -387,6 +387,10 @@
   </div>
 
   <script>
+    // ---------- Google Apps Script Web App URL ----------
+    // Paste the /exec URL from your Apps Script deployment here.
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYMmQ9baPL-Ch23x36263x_S4AL8DuidG2Vb4AxKHSMnwYJSHDHWHpmXjlOo7I6O7yfg/exec';
+
     // ---------- Feedback modal open/close ----------
     const feedbackModal = document.getElementById('feedbackModal');
     function openFeedback() {
@@ -465,8 +469,12 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>Sending...';
 
-      google.script.run
-        .withSuccessHandler(function (res) {
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'feedback', name: name, mobile: mobile, rating: selectedRating })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
           btn.disabled = false;
           btn.textContent = 'Send Feedback';
           if (res.success) {
@@ -480,12 +488,11 @@
             showStatus('feedbackStatus', false, res.message);
           }
         })
-        .withFailureHandler(function (err) {
+        .catch(function (err) {
           btn.disabled = false;
           btn.textContent = 'Send Feedback';
           showStatus('feedbackStatus', false, 'Something went wrong. Please try again.');
-        })
-        .submitFeedback({ name: name, mobile: mobile, rating: selectedRating });
+        });
 
       return false;
     }
@@ -512,8 +519,12 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>Submitting...';
 
-      google.script.run
-        .withSuccessHandler(function (res) {
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'order', name: name, mobile: mobile, packSize: packSize, qty: qty, area: area, city: city })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
           btn.disabled = false;
           btn.textContent = 'Place My Order 🍬';
           if (res.success) {
@@ -525,12 +536,11 @@
             showStatus('orderStatus', false, res.message);
           }
         })
-        .withFailureHandler(function (err) {
+        .catch(function (err) {
           btn.disabled = false;
           btn.textContent = 'Place My Order 🍬';
           showStatus('orderStatus', false, 'Something went wrong. Please try again.');
-        })
-        .submitOrder({ name: name, mobile: mobile, packSize: packSize, qty: qty, area: area, city: city });
+        });
 
       return false;
     }
